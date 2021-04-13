@@ -35,3 +35,7 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### secret stuff ###
+twitter4j.properties
+
