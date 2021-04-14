@@ -1,0 +1,6 @@
+# .pairs - configuration for 'git pair'
+pairs:
+  # <initials>: <Firstname> <Lastname>[; <email-id>]
+  ls: dime0000;
+
+global: false
