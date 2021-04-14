@@ -33,3 +33,5 @@ This is related to the above configuration. Difficult to explain, but recommend 
 This can run anywhere that supports JAVA - however, I'm currently running this on a Raspberry Pi Zero! As such, you'll notice that the source compatibility in build.gradle is set to JAVA 8. 
 For a Pi Zero, you'll probably want to run a light OS - I'm using Raspberry Pi OS Lite. Use the openjdk-8-jre-zero apt package to run JAVA 8 on the Pi Zero.
 
+## See it in action!
+Visit my Twitter account - www.twitter.com/dime0000 to see the tweets!
