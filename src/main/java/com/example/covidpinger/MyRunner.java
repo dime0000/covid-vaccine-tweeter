@@ -1,6 +1,7 @@
 package com.example.covidpinger;
 
 import com.google.common.base.Splitter;
+import models.TweetBuilder;
 import models.VaccineSpotterFeatures;
 import models.VaccineSpotterModel;
 import org.jsoup.Jsoup;
@@ -90,9 +91,10 @@ public class MyRunner implements CommandLineRunner {
         try {
             List<VaccineSpotterFeatures> successAppointments = pullOpenAppointmentsFromVaccineSpotter();
 
-            StringBuilder emailBody = extractVaccineSpotterAppointmentsForArea(successAppointments);
+            List<TweetBuilder> tweets = extractVaccineSpotterAppointmentsForArea(successAppointments);
+            Collections.sort(tweets);
 
-            sendVaccineAppointments(emailBody);
+            sendVaccineAppointments(buildMessageBody(tweets));
 
         } catch (RestClientException e) {
             e.printStackTrace();
@@ -103,12 +105,21 @@ public class MyRunner implements CommandLineRunner {
         try {
             List<Element> successAppointments = pullOpenAppointmentsFromFindAShot();
 
-            StringBuilder emailBody = extractFindAShotAppointmentsForArea(successAppointments);
+            List<TweetBuilder> tweets = extractFindAShotAppointmentsForArea(successAppointments);
+            Collections.sort(tweets);
 
-            sendVaccineAppointments(emailBody);
+            sendVaccineAppointments(buildMessageBody(tweets));
         } catch (RestClientException e) {
             e.printStackTrace();
         }
+    }
+
+    private StringBuilder buildMessageBody(List<TweetBuilder> tweets) {
+        StringBuilder message = new StringBuilder();
+        tweets.forEach(tweet -> {
+            message.append(tweet.message);
+        });
+        return message;
     }
 
     private List<VaccineSpotterFeatures> pullOpenAppointmentsFromVaccineSpotter() throws RestClientException {
@@ -150,30 +161,37 @@ public class MyRunner implements CommandLineRunner {
         return successAppointments;
     }
 
-    private StringBuilder extractVaccineSpotterAppointmentsForArea(List<VaccineSpotterFeatures> successAppointments) {
+    private List<TweetBuilder> extractVaccineSpotterAppointmentsForArea(List<VaccineSpotterFeatures> successAppointments) {
 
-        StringBuilder emailBody = new StringBuilder();
+        List<TweetBuilder> tweets = new ArrayList<>();
+
         successAppointments.forEach(appt -> {
             try {
+
                 double distance = distance(appt.geometry.coordinates[1], appt.geometry.coordinates[0]);
                 if (distance <= myMaxMiles && appt.properties.name != null  &&
                         appt.properties.address != null && !appt.properties.name.isEmpty() &&
                         !appt.properties.address.isEmpty()) {
-                    emailBody.append(appt.properties.name).append(" - ").append(appt.properties.address).append(" ")
+                    StringBuilder message = new StringBuilder();
+                    TweetBuilder tweet = new TweetBuilder();
+                    tweet.distance = distance;
+                    message.append(appt.properties.name).append(" - ").append(appt.properties.address).append(" ")
                             .append(appt.properties.city).append(", ").append(appt.properties.state).append(" ")
                             .append(appt.properties.postal_code).append("\n");
+                    tweet.message = message.toString();
+                    tweets.add(tweet);
                 }
             } catch (NumberFormatException e) {
                 // do nothing
             }
         });
 
-        return emailBody;
+        return tweets;
     }
 
-    private StringBuilder extractFindAShotAppointmentsForArea(List<Element> successAppointments) {
+    private List<TweetBuilder> extractFindAShotAppointmentsForArea(List<Element> successAppointments) {
 
-        StringBuilder emailBody = new StringBuilder();
+        List<TweetBuilder> tweets = new ArrayList<>();
 
         successAppointments.forEach(appt -> {
             String store = appt.select(".title").text();
@@ -184,14 +202,19 @@ public class MyRunner implements CommandLineRunner {
                 double distance = distance(locationLat, locationLong);
 
                 if (distance <= myMaxMiles) {
-                    emailBody.append(store).append(" - ").append(location).append("\n");
+                    StringBuilder message = new StringBuilder();
+                    TweetBuilder tweet = new TweetBuilder();
+                    tweet.distance = distance;
+                    message.append(store).append(" - ").append(location).append("\n");
+                    tweet.message = message.toString();
+                    tweets.add(tweet);
                 }
             } catch (NumberFormatException e) {
                 // do nothing
             }
         });
 
-        return emailBody;
+        return tweets;
     }
 
     private void sendVaccineAppointments(StringBuilder vaccineAppointments) {
