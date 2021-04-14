@@ -20,7 +20,7 @@ The max length of each tweet (Twitter maxes out at 280)
 The twitter ID to which this script will reply to
 #### pings.findashot
 Configures whether or not it will use findashot.org as a source
-#### pings.vaccinehunter
+#### pings.vaccinespotter
 Configures whether or not it will use vaccinespotter.org as a source
 #### pings.seconds.between
 The amount of seconds it waits before pinging your sources again
@@ -28,10 +28,26 @@ The amount of seconds it waits before pinging your sources again
 Configures whether or not it will clean out tweets sent by this script that are older than an hour
 #### tweets.clean.old.tweets.count
 This is related to the above configuration. Difficult to explain, but recommend just keeping in at 200
+#### urls.vaccinespotter
+The vaccinespotter.org api url
+#### urls.findashot
+The starting url for findashot.org
 
 ## Current running setup
 This can run anywhere that supports JAVA - however, I'm currently running this on a Raspberry Pi Zero! As such, you'll notice that the source compatibility in build.gradle is set to JAVA 8. 
 For a Pi Zero, you'll probably want to run a light OS - I'm using Raspberry Pi OS Lite. Use the openjdk-8-jre-zero apt package to run JAVA 8 on the Pi Zero.
+
+## Run it
+This is a Java Spring app, so all rules apply. You can...
+Run it from the project root:
+```
+./gradlew bootRun
+```
+Or, do as I do and deploy it as a JAR, and run that
+```
+./gradlew bootJar
+nohup java -jar covid-pinger-0.0.1-SNAPSHOT.jar &
+```
 
 ## See it in action!
 Visit my Twitter account - www.twitter.com/dime0000 to see the tweets!

@@ -43,8 +43,8 @@ public class MyRunner implements CommandLineRunner {
     @Value("${pings.findashot}")
     private boolean pingFindAShot;
 
-    @Value("${pings.vaccinehunter}")
-    private boolean pingVaccineHunter;
+    @Value("${pings.vaccinespotter}")
+    private boolean pingVaccineSpotter;
 
     @Value("${pings.seconds.between}")
     private int secondsBetweenPings;
@@ -61,6 +61,12 @@ public class MyRunner implements CommandLineRunner {
     @Value("${tweets.clean.old.tweets.count}")
     private int cleanTweetCount;
 
+    @Value("${urls.vaccinespotter}")
+    private String vaccineSpotterUrl;
+
+    @Value("${urls.findashot}")
+    private String findAShotUrl;
+
     @Autowired
     public MyRunner(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -74,7 +80,7 @@ public class MyRunner implements CommandLineRunner {
                 if (cleanOldTweets) {cleanOldTweets();}
 
                 if (pingFindAShot) {tweetFindAShotAppointments();}
-                if (pingVaccineHunter) {tweetVaccineSpotterAppointments();}
+                if (pingVaccineSpotter) {tweetVaccineSpotterAppointments();}
                 Thread.sleep(secondsBetweenPings * 1000);
             }
 
@@ -116,9 +122,7 @@ public class MyRunner implements CommandLineRunner {
 
     private StringBuilder buildMessageBody(List<TweetBuilder> tweets) {
         StringBuilder message = new StringBuilder();
-        tweets.forEach(tweet -> {
-            message.append(tweet.message);
-        });
+        tweets.forEach(tweet -> message.append(tweet.message));
         return message;
     }
 
@@ -128,7 +132,7 @@ public class MyRunner implements CommandLineRunner {
         headers.add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36");
 
         ResponseEntity<VaccineSpotterModel> model = restTemplate.exchange(
-                "https://www.vaccinespotter.org/api/v0/states/IL.json", HttpMethod.GET,
+                vaccineSpotterUrl, HttpMethod.GET,
                 new HttpEntity<>(headers), VaccineSpotterModel.class);
 
         List<VaccineSpotterFeatures> properties = new ArrayList<>();
@@ -144,7 +148,7 @@ public class MyRunner implements CommandLineRunner {
     }
 
     private List<Element> pullOpenAppointmentsFromFindAShot() throws RestClientException {
-        String source = restTemplate.getForObject("https://www.findashot.org/appointments/us/zip/60030",
+        String source = restTemplate.getForObject(findAShotUrl,
                 String.class);
         List<Element> successAppointments = new ArrayList<>();
 
