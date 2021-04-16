@@ -1,4 +1,4 @@
-package com.example.covidpinger;
+package com.covidpinger;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -7,7 +7,6 @@ import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class CovidPingerApplication {
-
 
 	public static void main(String[] args) {
 		SpringApplication.run(CovidPingerApplication.class, args);

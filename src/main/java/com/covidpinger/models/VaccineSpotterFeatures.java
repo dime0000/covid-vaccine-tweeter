@@ -1,4 +1,4 @@
-package models;
+package com.covidpinger.models;
 
 public class VaccineSpotterFeatures {
     public VaccineSpotterGeometry geometry;

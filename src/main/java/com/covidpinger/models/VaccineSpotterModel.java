@@ -1,4 +1,4 @@
-package models;
+package com.covidpinger.models;
 
 import java.util.List;
 
